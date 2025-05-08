@@ -14,26 +14,17 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
-
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install -g vercel@32.5.1  # Using stable version
 
-      - name: Verify access
+      - name: Verify Project Access
         run: |
-          echo "ORG: ${{ secrets.VERCEL_ORG_ID }}"
-          vercel projects ls --token ${{ secrets.VERCEL_TOKEN }}
+          vercel whoami --token ${{ secrets.VERCEL_TOKEN }}
+          vercel link --yes --token ${{ secrets.VERCEL_TOKEN }} --project ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Deploy to Production
+      - name: Production Deploy
         run: |
-          vercel deploy --prod --confirm \
+          vercel deploy --prod --yes \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --scope ${{ secrets.VERCEL_ORG_ID }} \
-            --name augur-dashboard
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+            --build-env REACT_APP_VERSION=${{ github.sha }}
