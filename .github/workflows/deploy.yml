@@ -12,19 +12,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Verify Project Access
+      - name: Verify access
         run: |
-          npx vercel projects ls --token ${{ secrets.VERCEL_TOKEN }}
-          npx vercel ls ${{ secrets.VERCEL_PROJECT_ID }} --token ${{ secrets.VERCEL_TOKEN }}
+          echo "ORG: ${{ secrets.VERCEL_ORG_ID }}"
+          vercel projects ls --token ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy
+      - name: Deploy to Production
         run: |
-          npx vercel deploy --prod --token ${{ secrets.VERCEL_TOKEN }} \
+          vercel deploy --prod --confirm \
+            --token ${{ secrets.VERCEL_TOKEN }} \
             --scope ${{ secrets.VERCEL_ORG_ID }} \
-            --project ${{ secrets.VERCEL_PROJECT_ID }}
+            --name augur-dashboard
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
