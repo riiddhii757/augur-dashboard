@@ -13,18 +13,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+          cache: 'npm'
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@32.5.1  # Using stable version
+        run: npm install -g vercel@32.5.1
 
-      - name: Verify Project Access
+      - name: Link Project
         run: |
-          vercel whoami --token ${{ secrets.VERCEL_TOKEN }}
-          vercel link --yes --token ${{ secrets.VERCEL_TOKEN }} --project ${{ secrets.VERCEL_PROJECT_ID }}
+          echo "Linking to project ${{ secrets.VERCEL_PROJECT_ID }}"
+          vercel link --yes --token ${{ secrets.VERCEL_TOKEN }} -p ${{ secrets.VERCEL_PROJECT_ID }} -t ${{ secrets.VERCEL_TOKEN }}
 
       - name: Production Deploy
         run: |
           vercel deploy --prod --yes \
             --token ${{ secrets.VERCEL_TOKEN }} \
-            --scope ${{ secrets.VERCEL_ORG_ID }} \
             --build-env REACT_APP_VERSION=${{ github.sha }}
