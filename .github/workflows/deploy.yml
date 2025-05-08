@@ -35,7 +35,6 @@ jobs:
 
       - name: Production Deploy
         run: |
-          vercel deploy --prod --yes \
-            --token ${{ secrets.VERCEL_TOKEN }} \
-            --build-env REACT_APP_VERSION=${{ github.sha }}
+          vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+
 
