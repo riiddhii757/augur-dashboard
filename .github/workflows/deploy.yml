@@ -1,4 +1,5 @@
 name: Deploy to Vercel
+
 on:
   push:
     branches: [main]
@@ -14,6 +15,12 @@ jobs:
         with:
           node-version: 18.x
           cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
 
       - name: Install Vercel CLI
         run: npm install -g vercel@32.5.1
@@ -31,3 +38,4 @@ jobs:
           vercel deploy --prod --yes \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --build-env REACT_APP_VERSION=${{ github.sha }}
+
