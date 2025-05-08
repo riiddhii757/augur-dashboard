@@ -2,32 +2,32 @@ name: Deploy to Vercel
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'README.md'
-      - 'DEPLOYMENT.md'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Node.js
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 18.x
           cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm install
-          
-      - name: Build project
-        run: npm run build
-          
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@32.5.1
+
+      - name: Link Project (Manual Config)
+        run: |
+          mkdir -p .vercel
+          echo '{
+            "orgId": "${{ secrets.VERCEL_ORG_ID }}",
+            "projectId": "${{ secrets.VERCEL_PROJECT_ID }}"
+          }' > .vercel/project.json
+
+      - name: Production Deploy
+        run: |
+          vercel deploy --prod --yes \
+            --token ${{ secrets.VERCEL_TOKEN }} \
+            --build-env REACT_APP_VERSION=${{ github.sha }}
